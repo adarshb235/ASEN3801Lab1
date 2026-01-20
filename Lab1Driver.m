@@ -28,7 +28,7 @@ grid on;
 
 %% SECTION INTENDED TO TEST BEHAVIOR IN THE WIND
 
-wind_vel_test = -15:4:15;
+wind_vel_test = -16:4:16;
 wind_vel_tests = [wind_vel_test' zeros(length(wind_vel_test), 1) zeros(length(wind_vel_test), 1)];
 wind_vel_tests = transpose(wind_vel_tests);
 
@@ -36,18 +36,39 @@ results = cell(length(wind_vel_test), 1);
 
 figure;
 hold on;
+grid on;
+box on;
 ylabel('North Position')
 xlabel('East Position')
 for i = 1:length(wind_vel_test)
     [t_final_1, x_final_1] = ode45(@(t, x) objectEOM(t,x,rho,Cd,A,m,g,wind_vel_tests(:, i)), [0 100], x_i, options);
     results{i}.time = t_final_1;
+    results{i}.windspeed = wind_vel_test(i);
     results{i}.x = x_final_1;
+    deflection = (x_final(end, 1) - results{i}.x(end, 1));
+    results{i}.deflPer = deflection ./ wind_vel_test(i);
+    totalDist = norm(x_final_1(end, 1:3));
+    results{i}.dist = abs(totalDist ./ wind_vel_test(i)); 
     names(i) = "X Wind Vel" + wind_vel_test(i);
     plot(x_final_1(:, 2), x_final_1(:, 1));
 end
 legend(names);
+hold off;
+grid off;
+box off;
+
+figure;
+hold on;
+for j = 1:length(wind_vel_test)
+    plot3(results{j}.x(:, 1), results{j}.x(:, 2), results{j}.x(:, 3))
+end
+view(3)
+set(gca, 'ZDir', 'reverse'); 
+xlabel('North'); ylabel('East'); zlabel('Down');
 grid on;
 box on;
+
+
 
 %% Event function
 
