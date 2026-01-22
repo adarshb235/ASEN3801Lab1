@@ -83,7 +83,7 @@ distanceE = zeros(length(wind_vel_test), length(altVec));
 figure
 hold on;
 for k = 1:length(altVec)
-    [rho, ~, ~, ~, ~, ~] = stdatmo(k);
+    [rho, a, temp, press, kvisc, ZorH] = stdatmo(altVec(k));
     for i = 1:length(wind_vel_test)
         [t_2, x_2] = ode45(@(t, x) objectEOM(t,x,rho,Cd,A,m,g,wind_vel_tests(:, i)), [0 100], x_i, options);
         resultsE{i, k}.x = x_2;
@@ -105,6 +105,10 @@ box on;
 figure;
 hold on;
 plot(wind_vel_test, distanceE);
+xlabel("Wind Speed (m/s)")
+ylabel("Distance Travelled (m)")
+title("Distance @ Land vs Cross Wind Speed")
+legend(string(altVec) + " m/s", 'Location', 'best')
 grid on;
 box on;
 
