@@ -12,8 +12,8 @@ g = 9.81;
 const = [Cd d A m g];
 
 v_i = [0; 20; -20];
-x_i = [0; 0; 0];
-x_i = [x_i; v_i];
+p_i = [0; 0; 0];
+x_i = [p_i; v_i];
 wind_vel = [0; 0; 0];
 
 
@@ -28,11 +28,11 @@ grid on;
 
 %% SECTION INTENDED TO TEST BEHAVIOR IN THE WIND
 
-wind_vel_test = -16:4:16;
+wind_vel_test = 0:3:60;
 wind_vel_tests = [wind_vel_test' zeros(length(wind_vel_test), 1) zeros(length(wind_vel_test), 1)];
 wind_vel_tests = transpose(wind_vel_tests);
 
-results = cell(length(wind_vel_test), 1);
+resultsD = cell(length(wind_vel_test), 1);
 
 figure;
 hold on;
@@ -42,13 +42,11 @@ ylabel('North Position')
 xlabel('East Position')
 for i = 1:length(wind_vel_test)
     [t_final_1, x_final_1] = ode45(@(t, x) objectEOM(t,x,rho,Cd,A,m,g,wind_vel_tests(:, i)), [0 100], x_i, options);
-    results{i}.time = t_final_1;
-    results{i}.windspeed = wind_vel_test(i);
-    results{i}.x = x_final_1;
-    deflection = (x_final(end, 1) - results{i}.x(end, 1));
-    results{i}.deflPer = deflection ./ wind_vel_test(i);
-    totalDist = norm(x_final_1(end, 1:3));
-    results{i}.dist = abs(totalDist ./ wind_vel_test(i)); 
+    resultsD{i}.time = t_final_1;
+    resultsD{i}.windspeed = wind_vel_test(i);
+    resultsD{i}.x = x_final_1;
+    deflection(i) = (x_final(end, 1) - resultsD{i}.x(end, 1));
+    totalDist(i) = norm(x_final_1(end, 1:3) - p_i');
     names(i) = "X Wind Vel" + wind_vel_test(i);
     plot(x_final_1(:, 2), x_final_1(:, 1));
 end
@@ -59,12 +57,54 @@ box off;
 
 figure;
 hold on;
+plot(wind_vel_test, totalDist);
+grid on;
+box on;
+
+figure;
+plot(resultsD{1}.time(:), resultsD{1}.x(:, 1));
+
+figure;
+hold on;
 for j = 1:length(wind_vel_test)
-    plot3(results{j}.x(:, 1), results{j}.x(:, 2), results{j}.x(:, 3))
+    plot3(resultsD{j}.x(:, 1), resultsD{j}.x(:, 2), resultsD{j}.x(:, 3))
 end
 view(3)
 set(gca, 'ZDir', 'reverse'); 
 xlabel('North'); ylabel('East'); zlabel('Down');
+grid on;
+box on;
+
+altVec = 0:200:1800;
+
+resultsE = cell(length(wind_vel_test), length(altVec));
+distanceE = zeros(length(wind_vel_test), length(altVec));
+
+figure
+hold on;
+for k = 1:length(altVec)
+    [rho, ~, ~, ~, ~, ~] = stdatmo(k);
+    for i = 1:length(wind_vel_test)
+        [t_2, x_2] = ode45(@(t, x) objectEOM(t,x,rho,Cd,A,m,g,wind_vel_tests(:, i)), [0 100], x_i, options);
+        resultsE{i, k}.x = x_2;
+        resultsE{i, k}.t = t_2;
+        resultsE{i, k}.windspeed = wind_vel_test(i);
+        resultsE{i, k}.distance = norm(x_2(end, 1:3) - p_i');
+        distanceE(i, k) = norm(x_2(end, 1:3) - p_i');
+        plot3(x_2(:, 1), x_2(:, 2), x_2(:, 3));
+    end
+end
+view(3)
+grid on;
+set(gca, 'ZDir', 'reverse'); 
+xlabel('North'); ylabel('East'); zlabel('Down');
+grid on;
+box on;
+
+
+figure;
+hold on;
+plot(wind_vel_test, distanceE);
 grid on;
 box on;
 
