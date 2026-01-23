@@ -89,6 +89,8 @@ legend(string(wind_vel_list) + " m/s")
 grid on;
 box on;
 
+%% SECTION INTENDED TO TEST ALTITUDE EFFECTS
+
 altVec = 0:300:1800; % create vector of altitudes to test
 
 resultsE = cell(length(wind_vel_list), length(altVec));
@@ -130,6 +132,8 @@ plot(altVec, minDist, 'o-', 'LineWidth', 1.3)
 title('Problem 2.e.2: Minimum Origin to Landing Distance Travelled vs Altitude')
 xlabel('Altitude (m)')
 ylabel('Distance Travelled')
+
+%% SECTION TO TEST KINETIC ENERGY FIXING
 
 [rho, a, temp, press, kvisc, ZorH] = stdatmo(1655); % reset conditions back to original
 
