@@ -125,3 +125,32 @@ for i = 1:1
     ylabel('Yaw Angle (rad)');
     title('Average Yaw vs Time');
 end
+
+% Problem 5
+
+pos_rel_E = tar_pos_inert - av_pos_inert;
+
+figure;
+hold on;
+grid on;
+box on;
+sgtitle("Problem 6: Relative Positions of Target With Respect to the Aerospace Vehicle in E Frame")
+
+
+subplot(3, 1, 1)
+hold on;
+plot(t_vec, pos_rel_E(1,:), 'b');
+ylabel('X position (m)');
+title('Relative X Position of Target With Respect to the Aerospace Vehicle in E Frame');
+
+subplot(3, 1, 2)
+hold on;
+plot(t_vec, pos_rel_E(2,:), 'b');
+ylabel('Y position (m)');
+title('Relative Y Position of Target With Respect to the Aerospace Vehicle in E Frame');
+
+subplot(3, 1, 3)
+hold on;
+plot(t_vec, pos_rel_E(3,:), 'b');
+ylabel('Z position (m)');
+title('Relative Z Position of Target With Respect to the Aerospace Vehicle in E Frame');
